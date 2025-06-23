@@ -1,13 +1,14 @@
 import React from 'react';
 import { Popover, Button, Collapse, type CollapseProps } from 'antd';
+import { useDrag } from 'react-dnd';
 import type { Status, Todo } from '../types';
 import { Statuses } from '../types/status';
-import { CloseCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 interface TodoItemProps {
   todo: Todo;
-  onMoveTodo: (id: string, status: Status) => void;
-  onDeleteTodo: (id: string) => void;
+  onMoveTodo: (id: number, status: Status) => void;
+  onDeleteTodo: (id: number) => void;
 }
 
 const {
@@ -18,6 +19,15 @@ const {
 
 const TodoItem: React.FC<TodoItemProps> = ({ todo, onMoveTodo, onDeleteTodo }) => {
   const { title, description, status, id } = todo;
+  
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'TODO',
+    item: { id, status },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
+
   const colors = {
     header: status === PENDING ? '#69b1ff' : status === IN_PROGRESS ? '#ffc069' : status === COMPLETED ? '#95de64' : '#FFF',
     body: status === PENDING ? '#bae0ff' : status === IN_PROGRESS ? '#ffffb8' : status === COMPLETED ? '#d9f7be' : '#FFF',
@@ -42,28 +52,41 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onMoveTodo, onDeleteTodo }) =
     label: (
       <Popover content={contextMenu} trigger="contextMenu">
         <div>
-          <span>
-            <strong>{title}</strong>
-            <CloseCircleOutlined
-              onClick={() => onDeleteTodo(id)}
-              style={{
-                color: 'red',
-                cursor: 'pointer',
-                float: 'right',
-                fontSize: '2rem',
-              }}
-            />
-          </span>
+          <strong>
+            <span style={{
+              backgroundColor: '#FFF',
+              padding: '0.2rem 0.8rem',
+              borderRadius: '4rem',
+              marginRight: '0.7rem'
+            }}>
+              {id}
+            </span>{' '}
+            {title}
+          </strong>
         </div>
       </Popover>
     ),
     children: (
       <Popover content={contextMenu} trigger="contextMenu">
-        <div
-          className="item-body m-0 p-2"
-          style={{ backgroundColor: colors.body }}
-        >
+        <div className=" m-0 p-2" style={{ backgroundColor: colors.body }}>
           <p>{description}</p>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'end',
+            gap: '1rem',
+            padding: '1rem 2rem',
+            backgroundColor: colors.body,
+            borderRadius: '0 0 0.8rem 0.8rem'
+          }}
+        >
+          <Button icon={<EditOutlined />} onClick={() => { }}>
+            Edit
+          </Button>
+          <Button icon={<DeleteOutlined />} onClick={() => onDeleteTodo(id)} danger>
+            Delete
+          </Button>
         </div>
       </Popover>
     ),
@@ -71,13 +94,18 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onMoveTodo, onDeleteTodo }) =
 
 
   return (
-    <Collapse
-      accordion
-      items={panelItems}
-      expandIconPosition="start"
-      className='todo-item mb-1 p-0'
-      style={{ backgroundColor: colors.header }}
-    />
+    <div
+      ref={drag}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
+      <Collapse
+        accordion
+        items={panelItems}
+        expandIconPosition="end"
+        className='todo-item mb-1 p-0'
+        style={{ backgroundColor: colors.header }}
+      />
+    </div>
   );
 };
 
