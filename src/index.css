@@ -1,0 +1,54 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  font-size: 10px;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: #bae0ff;
+}
+main {
+  background-color: #bae0ff;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+/* --------------colors-------------- */
+.text-white {
+  color: #fff;
+}
+
+.bg-lightblue {
+  background-color: #bae0ff;
+}
+
+.bg-blue {
+  background-color: #1677ff;
+}
+/* --------------colors-------------- */
+/* --------------spacings-------------- */
+.p-5 {
+  padding: 50px;
+}
+/* --------------spacings-------------- */
+
+.ant-form-item-label {
+  padding-bottom: 0 !important;
+}
+.ant-form-item-label label {
+  font-weight: 600;
+}
