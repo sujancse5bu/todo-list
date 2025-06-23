@@ -17,7 +17,7 @@ const { PENDING, IN_PROGRESS, COMPLETED } = Statuses;
 interface ColumnProps {
   status: Status;
   todos: Todo[];
-  onMoveTodo: (id: number, status: Status) => void;
+  onUpdateTodo: (id: number, todo: Todo) => void;
   onAddTodo: (newTodo: Todo) => void;
   onDeleteTodo: (id: number) => void;
 }
@@ -25,7 +25,7 @@ interface ColumnProps {
 const Column: React.FC<ColumnProps> = ({
   status,
   todos,
-  onMoveTodo,
+  onUpdateTodo,
   onAddTodo,
   onDeleteTodo,
 }) => {
@@ -33,7 +33,7 @@ const Column: React.FC<ColumnProps> = ({
     accept: 'TODO',
     drop: (item: Todo) => {
       console.log('dropped item: ', item, status)
-      onMoveTodo(item.id, status);
+      onUpdateTodo(item.id, { ...item, status });
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -41,6 +41,7 @@ const Column: React.FC<ColumnProps> = ({
   }));
 
   const [modalVisibleFor, setModalVisibleFor] = useState('');
+  const [selectedForEdit, setSelectedForEdit] = useState<Todo | undefined>()
 
   const getStatusIcon = (status: Status) => {
     switch (status) {
@@ -76,6 +77,7 @@ const Column: React.FC<ColumnProps> = ({
 
   const handleCancel = () => {
     setModalVisibleFor('');
+    setSelectedForEdit(undefined)
   };
 
   return (
@@ -87,7 +89,7 @@ const Column: React.FC<ColumnProps> = ({
         title={getStatusIcon(status)}
         className="mb-2"
         style={{
-          boxShadow: isOver ? '0 0 1rem 0.3rem #1677ff' : ''
+          boxShadow: isOver ? '0 0 1rem 0.3rem #96B7A6' : ''
         }}
         extra={
           <Button
@@ -103,8 +105,9 @@ const Column: React.FC<ColumnProps> = ({
           <TodoItem
             key={todo.id}
             todo={todo}
-            onMoveTodo={onMoveTodo}
+            onUpdateTodo={onUpdateTodo}
             onDeleteTodo={onDeleteTodo}
+            setSelectedForEdit={setSelectedForEdit}
           />
         ))}
         {todos.length === 0 && (
@@ -114,8 +117,11 @@ const Column: React.FC<ColumnProps> = ({
 
       <TodoForm
         onAddTodo={onAddTodo}
-        modalVisibleFor={modalVisibleFor}
+        onUpdateTodo={onUpdateTodo}
         onCancel={handleCancel}
+        modalVisibleFor={modalVisibleFor}
+        selectedForEdit={selectedForEdit}
+        setSelectedForEdit={setSelectedForEdit}
       />
       
     </Col>

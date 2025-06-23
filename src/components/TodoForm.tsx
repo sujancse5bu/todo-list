@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Input, Button, Form, Modal, Row, Select, DatePicker } from 'antd';
 import type { Status, Todo } from '../types';
 import { Statuses } from '../types/status';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 const { PENDING, IN_PROGRESS, COMPLETED } = Statuses;
 
 interface TodoFormProps {
   onAddTodo: (todo: Todo) => void;
+  onUpdateTodo: (id: number, todo: Todo) => void;
   modalVisibleFor: string;
   onCancel: () => void;
+  selectedForEdit: Todo | undefined;
+  setSelectedForEdit: React.Dispatch<React.SetStateAction<Todo | undefined>>;
 }
 
 interface FormValues {
@@ -19,39 +22,69 @@ interface FormValues {
   dueDate?: Date;
 }
 
-const TodoForm: React.FC<TodoFormProps> = ({ onAddTodo, modalVisibleFor, onCancel }) => {
+const dateFormat = "YYYY-MM-DD HH:mm:ss A";
+
+const TodoForm: React.FC<TodoFormProps> = ({
+  onAddTodo,
+  onUpdateTodo,
+  modalVisibleFor,
+  onCancel,
+  selectedForEdit,
+  setSelectedForEdit,
+}) => {
   const [form] = Form.useForm();
-  const [selectedStatus, setSelectedStatus] = useState(modalVisibleFor)
-  const [maxId, setMaxId] = useState<number>(0)
+  const [selectedStatus, setSelectedStatus] = useState(modalVisibleFor);
 
   useEffect(() => {
-    setSelectedStatus(modalVisibleFor)
-  }, [modalVisibleFor])
+    if (selectedForEdit !== undefined) {
+      form.setFieldsValue({
+        title: selectedForEdit.title,
+        description: selectedForEdit.description,
+        status: selectedForEdit.status,
+      });
+      setSelectedStatus(selectedForEdit.status);
 
-  useEffect(() => {
-    const storedMaxId = localStorage.getItem('maxId');
-    if (storedMaxId) {
-      setMaxId(parseInt(storedMaxId, 10));
+      if (selectedForEdit.status === IN_PROGRESS) {
+        form.setFieldsValue({
+          dueDate: dayjs(selectedForEdit.dueDate || new Date()),
+        });
+      }
     }
-  }, []);
+  }, [selectedForEdit, form]);
+
+  useEffect(() => {
+    setSelectedStatus(modalVisibleFor);
+  }, [modalVisibleFor]);
+
+  const getMaxId = () => {
+    const storedTodos = localStorage.getItem('todos');
+    const todos = storedTodos ? JSON.parse(storedTodos) as Todo[] : [];
+    return todos.reduce((max, todo) => (todo.id > max ? todo.id : max), 0);
+  };
 
   const handleSubmit = (values: FormValues) => {
     const newTodo: Todo = {
-      id: maxId + 1,
+      id: selectedForEdit ? selectedForEdit.id : getMaxId() + 1,
       title: values.title,
       description: values.description,
       status: values.status,
       dueDate: values.dueDate,
     };
-    onAddTodo(newTodo);
-    form.resetFields()
-    onCancel()
+    if (selectedForEdit) {
+      onUpdateTodo(selectedForEdit.id, newTodo)
+    } else {
+      onAddTodo(newTodo);
+    }
+    
+    form.resetFields();
+    setSelectedForEdit(undefined);
+    onCancel();
   };
 
   return (
     <Modal
-      title="Add Todo"
-      open={modalVisibleFor.length > 0}
+      title={selectedForEdit ? 'Edit Todo' : 'Add Todo'}
+      open={selectedForEdit !== undefined || modalVisibleFor.length > 0}
       onCancel={onCancel}
       footer={null}
     >
@@ -59,16 +92,16 @@ const TodoForm: React.FC<TodoFormProps> = ({ onAddTodo, modalVisibleFor, onCance
         form={form}
         onFinish={handleSubmit}
         initialValues={{
-          title: '',
-          description: '',
-          status: modalVisibleFor || PENDING,
+          title: selectedForEdit?.title || '',
+          description: selectedForEdit?.description || '',
+          status: selectedForEdit?.status || modalVisibleFor || PENDING,
         }}
       >
         <Form.Item
           label="Title"
+          name="title"
           labelCol={{ span: 24 }}
           wrapperCol={{ span: 24 }}
-          name="title"
           rules={[{ required: true, message: 'Please input the title!' }]}
         >
           <Input placeholder="Enter Title" />
@@ -76,18 +109,18 @@ const TodoForm: React.FC<TodoFormProps> = ({ onAddTodo, modalVisibleFor, onCance
 
         <Form.Item
           label="Description"
+          name="description"
           labelCol={{ span: 24 }}
           wrapperCol={{ span: 24 }}
-          name="description"
         >
           <Input.TextArea placeholder="Enter Description" />
         </Form.Item>
 
         <Form.Item
           label="Status"
+          name="status"
           labelCol={{ span: 24 }}
           wrapperCol={{ span: 24 }}
-          name="status"
           rules={[{ required: true, message: 'Please select the status!' }]}
         >
           <Select
@@ -112,10 +145,10 @@ const TodoForm: React.FC<TodoFormProps> = ({ onAddTodo, modalVisibleFor, onCance
           >
             <DatePicker
               showTime
-              format="YYYY-MM-DD HH:mm:ss A"
+              format={dateFormat}
               placeholder="Select Due Date"
               style={{ width: '100%' }}
-              disabledDate={(current) => current && current < moment().startOf('day')}
+              disabledDate={(current) => current && current < dayjs().startOf('day')}  // Use dayjs instead of moment
             />
           </Form.Item>
         )}
@@ -124,8 +157,8 @@ const TodoForm: React.FC<TodoFormProps> = ({ onAddTodo, modalVisibleFor, onCance
           <Button key="back" type="default" onClick={onCancel}>
             Cancel
           </Button>
-          <Button key="submit" type="primary" htmlType="submit" className='ml-1'>
-            Add Todo
+          <Button key="submit" type="primary" htmlType="submit" className="ml-1">
+            Submit
           </Button>
         </Row>
       </Form>

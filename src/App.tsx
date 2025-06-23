@@ -15,7 +15,6 @@ const App: React.FC = () => {
   });
 
   useEffect(() => {
-    console.log('todos: ', todos)
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
 
@@ -27,8 +26,9 @@ const App: React.FC = () => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  const moveTodo = (id: number, status: Status) => {
-    setTodos((prevs) => prevs.map((todo) => (todo.id === id ? { ...todo, status } : todo)));
+  const updateTodo = (id: number, todo: Todo) => {
+    console.log('todo to update: ', todo)
+    setTodos((prevs) => prevs.map((prev) => (prev.id === id ? todo : prev)));
   };
 
   const filteredTodos = (status: Status) =>
@@ -36,18 +36,17 @@ const App: React.FC = () => {
 
   return (
     <Layout>
-      <Header className="bg-blue-6">
+      <Header className="bg-header">
         <h1 className="text-white">Todo List Application</h1>
       </Header>
-      <Content className="p-3">
-        <Row gutter={16}>
+      <Content>
+        <Row gutter={16} className='content-row'>
           {Object.values(Statuses).map((status) => (
-            <DndProvider backend={HTML5Backend}>
+            <DndProvider backend={HTML5Backend} key={status}>
               <Column
-                key={status}
                 status={status}
                 todos={filteredTodos(status)}
-                onMoveTodo={moveTodo}
+                onUpdateTodo={updateTodo}
                 onAddTodo={handleAddTodo}
                 onDeleteTodo={handleDeleteTodo}
               />

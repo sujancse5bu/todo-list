@@ -17,11 +17,12 @@ html,
 body {
   padding: 0;
   margin: 0;
-  background: #bae0ff;
+  background: #DBECE9;
 }
 main {
-  background-color: #bae0ff;
+  background-color: #DBECE9;
   user-select: none;
+  padding: 3rem;
 }
 
 p, h1, h2, h3, h4, h5, h6 {
@@ -35,12 +36,10 @@ p, h1, h2, h3, h4, h5, h6 {
 .bg-blue-1 {
   background-color: #e6f4ff
 }
-.bg-blue-2 {
-  background-color: #bae0ff;
-}
 
-.bg-blue-6 {
-  background-color: #1677ff;
+.bg-header {
+  background-color: #96B7A6;
+  /* background-color: #91caff; */
 }
 /* --------------colors-------------- */
 /* --------------spacings-------------- */
@@ -114,6 +113,92 @@ p, h1, h2, h3, h4, h5, h6 {
 .todo-item .item-body {
   border-radius: 0 0 0.8rem 0.8rem;
 }
-.test {
-  /* background-color: #7ef841; */
+/* -------------------96B7A6 */
+.ant-btn-primary {
+  background-color: #96B7A6 !important;
+  border-color: #96B7A6 !important;
+}
+
+.ant-btn-primary:hover {
+  background-color: #6B9080 !important;
+  border-color: #6B9080 !important;
+}
+
+
+/* ----- Responsiveness ---------- */
+@media (max-width: 575px) {
+  main {
+    padding: 2rem;
+  }
+  .ant-layout-header {
+    height: 5rem;
+    line-height: 5rem;
+  }
+  .content-row {
+    display: grid;
+  }
+
+  .content-row .ant-col {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .ant-btn,
+  .ant-btn-primary {
+    padding: 0 1rem !important;
+    font-size: 1.6rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Medium devices (Tablet) */
+@media (min-width: 576px) and (max-width: 767px) {
+  html {
+    font-size: 8px;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+
+  .ant-card-head {
+    padding: 0 1.6rem !important;
+  }
+
+  .ant-card-body {
+    padding: 1.6rem !important;
+  }
+  .ant-btn,
+  .ant-btn-primary {
+    padding: 0 1rem !important;
+    font-size: 1.6rem;
+  }
+
+  .content-row {
+    display: grid;
+  }
+  .content-row .ant-col {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  html {
+    font-size: 8px;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+
+  .ant-card-head {
+    padding: 0 1.6rem !important;
+  }
+  .ant-card-body {
+    padding: 1.6rem !important;
+  }
 }
