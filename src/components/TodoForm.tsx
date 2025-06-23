@@ -1,73 +1,82 @@
-import React, { useState } from 'react';
-import { Input, Button, Form, Modal } from 'antd';
+import React from 'react';
+import { Input, Button, Form, Modal, Row } from 'antd';
 import type { Todo } from '../types';
 import { Statuses } from '../types/status';
 
 interface TodoFormProps {
   onAddTodo: (todo: Todo) => void;
-  visible: boolean;
+  open: boolean;
   onCancel: () => void;
 }
 
-const TodoForm: React.FC<TodoFormProps> = ({ onAddTodo, visible, onCancel }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+interface FormValues {
+  title: string;
+  description: string;
+}
 
-  const handleSubmit = () => {
+const {
+  PENDING,
+  // IN_PROGRESS,
+  // COMPLETED,
+} = Statuses;
+
+const TodoForm: React.FC<TodoFormProps> = ({ onAddTodo, open, onCancel }) => {
+  const [form] = Form.useForm();
+  const { resetFields } = form;
+
+  const handleSubmit = (values: FormValues) => {
     const newTodo: Todo = {
       id: Math.random().toString(36).substr(2, 9),
-      title,
-      description,
-      status: Statuses.PENDING,
+      title: values.title,
+      description: values.description,
+      status: PENDING,
     };
     onAddTodo(newTodo);
-    setTitle('');
-    setDescription('');
-    onCancel();  // Close modal after form submission
+    resetFields()
+    onCancel();
   };
 
   return (
     <Modal
       title="Add Todo"
-      visible={visible}
+      open={open}
       onCancel={onCancel}
-      footer={[
-        <Button
-          key="back"
-          type='default'
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>,
-        <Button key="submit" type="primary" onClick={handleSubmit}>
-          Add Todo
-        </Button>,
-      ]}
+      footer={null}
     >
-      <Form onFinish={handleSubmit}>
+      <Form
+        form={form}
+        onFinish={handleSubmit}
+        initialValues={{ title: '', description: '' }}
+      >
         <Form.Item
           label="Title"
           labelCol={{ span: 24 }}
           wrapperCol={{ span: 24 }}
+          name="title"
           rules={[{ required: true, message: 'Please input the title!' }]}
         >
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder='Enter Title'
-          />
+          <Input placeholder="Enter Title" />
         </Form.Item>
         <Form.Item
           label="Description"
           labelCol={{ span: 24 }}
           wrapperCol={{ span: 24 }}
+          name="description"
         >
-          <Input.TextArea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder='Enter Description'
-          />
+          <Input.TextArea placeholder="Enter Description" />
         </Form.Item>
+        <Row justify="end">
+          <Button
+            key="back"
+            type='default'
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" htmlType="submit">
+            Add Todo
+          </Button>
+        </Row>
       </Form>
     </Modal>
   );

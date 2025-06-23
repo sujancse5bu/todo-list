@@ -1,69 +1,55 @@
-import React, { useState } from 'react';
-import { Layout, Row, Col } from 'antd';
-import TodoForm from './components/TodoForm';
+import React, { useEffect } from 'react';
+import { Layout, Row } from 'antd';
 import Column from './components/Column';
-import type { Todo } from './types';
 import { Statuses } from './types/status';
+import type { Status, Todo } from './types';
 
 const { Header, Content } = Layout;
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [todos, setTodos] = React.useState<Todo[]>(() => {
+    const storedTodos = localStorage.getItem('todos');
+    return storedTodos ? JSON.parse(storedTodos) : [];
+  });
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
+  useEffect(() => {
+      localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
 
   const handleAddTodo = (newTodo: Todo) => {
     setTodos([newTodo, ...todos]);
   };
-  const moveTodo = (id: string, status: Todo['status']) => {
+
+  const handleDeleteTodo = (id: string) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const moveTodo = (id: string, status: Status) => {
     setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, status } : todo
-      )
+      todos.map((todo) => (todo.id === id ? { ...todo, status } : todo))
     );
   };
 
-  const filteredTodos = (status: Todo['status']) =>
+  const filteredTodos = (status: Status) =>
     todos.filter((todo) => todo.status === status);
 
   return (
     <Layout>
-      <Header className='bg-blue' onClick={showModal}>
-        <h1 className='text-white'>Todo List Application</h1>
+      <Header className="bg-blue-6">
+        <h1 className="text-white">Todo List Application</h1>
       </Header>
-      <Content className='p-5'>
+      <Content className="p-3">
         <Row gutter={16}>
-          <Col span={24}>
-            <TodoForm
+          {Object.values(Statuses).map((status) => (
+            <Column
+              key={status}
+              status={status}
+              todos={filteredTodos(status)}
+              onMoveTodo={moveTodo}
               onAddTodo={handleAddTodo}
-              visible={isModalVisible}
-              onCancel={handleCancel}
+              onDeleteTodo={handleDeleteTodo}
             />
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Column
-            status={Statuses.PENDING}
-            todos={filteredTodos(Statuses.PENDING)}
-            onMoveTodo={moveTodo}
-          />
-          <Column
-            status={Statuses.IN_PROGRESS}
-            todos={filteredTodos(Statuses.IN_PROGRESS)}
-            onMoveTodo={moveTodo}
-          />
-          <Column
-            status={Statuses.COMPLETED}
-            todos={filteredTodos(Statuses.COMPLETED)}
-            onMoveTodo={moveTodo}
-          />
+          ))}
         </Row>
       </Content>
     </Layout>

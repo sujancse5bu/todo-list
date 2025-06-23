@@ -21,6 +21,7 @@ body {
 }
 main {
   background-color: #bae0ff;
+  user-select: none;
 }
 
 p, h1, h2, h3, h4, h5, h6 {
@@ -31,24 +32,88 @@ p, h1, h2, h3, h4, h5, h6 {
 .text-white {
   color: #fff;
 }
-
-.bg-lightblue {
+.bg-blue-1 {
+  background-color: #e6f4ff
+}
+.bg-blue-2 {
   background-color: #bae0ff;
 }
 
-.bg-blue {
+.bg-blue-6 {
   background-color: #1677ff;
 }
 /* --------------colors-------------- */
 /* --------------spacings-------------- */
-.p-5 {
-  padding: 50px;
+.m-0 {
+  margin: 0;
+}
+.ml-1 {
+  margin-left: 1rem;
+}
+.mr-1 {
+  margin-right: 1rem;
+}
+.mt-1 {
+  margin-top: 1rem;
+}
+.mb-1 {
+  margin-bottom: 1rem;
+}
+/* ----------- */
+.ml-2 {
+  margin-left: 2rem;
+}
+.mr-2 {
+  margin-right: 2rem;
+}
+.mt-2 {
+  margin-top: 2rem;
+}
+.mb-2 {
+  margin-bottom: 2rem;
+}
+/* ----------- */
+.p-0 {
+  padding: 0;
+}
+.p-1 {
+  padding: 1rem;
+}
+.p-2 {
+  padding: 2rem;
+}
+.p-3 {
+  padding: 3rem;
 }
 /* --------------spacings-------------- */
+/* -------- alignment -------------- */
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+.text-justify {
+  text-align: justify;
+}
+/* -------------------------- */
 
 .ant-form-item-label {
   padding-bottom: 0 !important;
 }
 .ant-form-item-label label {
   font-weight: 600;
+}
+.todo-item .ant-collapse-content-box {
+  padding: 0 !important;
+}
+
+.todo-item .item-body {
+  border-radius: 0 0 0.8rem 0.8rem;
+}
+.test {
+  background-color: #7ef841;
 }
